@@ -3,11 +3,17 @@ import json
 import re
 
 
-with open("question_format.html", "r") as f:
-    question_format = f.read()
+with open("eng_finn_question_format.html", "r") as f:
+    eng_finn_question_format = f.read()
 
-with open("answer_format.html", "r") as f:
-    answer_format = f.read()
+with open("eng_finn_answer_format.html", "r") as f:
+    eng_finn_answer_format = f.read()
+
+with open("finn_eng_question_format.html", "r") as f:
+    finn_eng_question_format = f.read()
+
+with open("finn_eng_answer_format.html", "r") as f:
+    finn_eng_answer_format = f.read()
 
 with open("style.css", "r") as f:
     style = f.read()
@@ -23,7 +29,7 @@ def format_english_for_card(eng_no_labs, label):
         brackets_info_html += f'{match}<br>'
         eng_no_labs = eng_no_labs.replace(match, "").strip()
     label_style = "label label-" + label.replace(' ', '_').replace(',', '')
-    label_html = f'<span class="{label_style}">{label}</span><br>' if label else ""
+    label_html = f'<br><span class="{label_style}">{label}</span><br>' if label else ""
     return eng_no_labs, brackets_info_html, label_html
 
 
@@ -42,9 +48,14 @@ my_model = genanki.Model(
   ],
   templates=[
     {
-      'name': 'Card 1',
-      'qfmt': question_format,
-      'afmt': answer_format
+      'name': 'Eng Finn',
+      'qfmt': eng_finn_question_format,
+      'afmt': eng_finn_answer_format
+    },
+    {
+      'name': 'Finn Eng',
+      'qfmt': finn_eng_question_format,
+      'afmt': finn_eng_answer_format
     },
   ],
   sort_field_index=0,
@@ -110,8 +121,8 @@ def make_anki_cards(vocab):
 
 
 
-    test_eng_word = 'to be visible (castle, mountain, etc.)'
-    test_label = 'adjective'
+    test_eng_word = 'to have no extra stuff'
+    test_label = ''
 
     eng_no_labs, brackets_info_html, label_html = format_english_for_card(test_eng_word, test_label)
     print(eng_no_labs)
