@@ -138,7 +138,8 @@ for l in vocablines:
                 maxlen["English"] = eng
             if len(suo) > len(maxlen["Finnish"]):
                 maxlen["Finnish"] = suo
-
+            if labs:
+                maxlen[labs] = maxlen.get(labs, 0) + 1
 
 
 

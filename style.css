@@ -1,0 +1,91 @@
+.label {
+    color: white;
+    padding: 4px 8px;
+    text-align: center;
+    border-radius: 5px;
+    font-size: 12px;
+}
+.label-about {
+    background-color: coral;
+}
+.label-adjective {
+    background-color: red;
+}
+.label-adverb {
+    background-color: violet;
+}
+.label-animate {
+    background-color: orange;
+}
+.label-attributive_noun_used_as_adjective {
+    background: repeating-linear-gradient(
+        45deg,
+        yellow,
+        yellow 10px,
+        red 10px,
+        red 20px
+      );
+}
+.label-for_example {
+    background-color: red;
+}
+.label-et_cetera {
+    background-color: red;
+}
+.label-familiar {
+    background-color: orange;
+}
+.label-feminine {
+    background-color: pink;
+}
+.label-formal {
+    background-color: purple;
+}
+.label-inanimate {
+    background-color: red;
+}
+.label-masculine {
+    background-color: darkblue;
+}
+.label-mathematics {
+    background-color: orangered;
+}
+.label-military {
+    background-color: darkgreen;
+}
+.label-noun {
+    background-color: yellow;
+}
+.label-plural {
+    background-color: red;
+}
+.label-pronoun {
+    background-color: lightgreen;
+}
+.label-somebody {
+    background-color: lightblue;
+}
+.label-singular {
+    background-color: red;
+}
+.label-something {
+    background-color: maroon;
+}
+.label-auxiliary_verb {
+    background-color: olive;
+}
+.label-intransitive_verb {
+    background-color: purple;
+}
+.label-intransitive_transitive_verb {
+    background: repeating-linear-gradient(
+      45deg,
+      green,
+      green 10px,
+      purple 10px,
+      purple 20px
+    );
+}
+.label-transitive_verb {
+    background-color: green;
+}

@@ -6,9 +6,11 @@ import re
 with open("question_format.html", "r") as f:
     question_format = f.read()
 
-
 with open("answer_format.html", "r") as f:
     answer_format = f.read()
+
+with open("style.css", "r") as f:
+    style = f.read()
 
 
 # non-greedy; different bracketed qualifiers will be on separate lines
@@ -20,7 +22,8 @@ def format_english_for_card(eng_no_labs, label):
     for match in findall:
         brackets_info_html += f'{match}<br>'
         eng_no_labs = eng_no_labs.replace(match, "").strip()
-    label_html = f'<span class="{label}">{label}</span><br>' if label else ""
+    label_style = "label label-" + label.replace(' ', '_').replace(',', '')
+    label_html = f'<span class="{label_style}">{label}</span><br>' if label else ""
     return eng_no_labs, brackets_info_html, label_html
 
 
@@ -45,16 +48,7 @@ my_model = genanki.Model(
     },
   ],
   sort_field_index=0,
-  css="""
-    .badge {
-        background-color: red;
-        color: white;
-        padding: 4px 8px;
-        text-align: center;
-        border-radius: 5px;
-        font-size: 12px;
-    }
-    """
+  css=style
 )
 
 
@@ -87,7 +81,7 @@ def make_anki_cards(vocab):
     )
 
     test_eng_word = 'to be visible (castle, mountain, etc.)'
-    test_label = 'badge'
+    test_label = 'intransitive, transitive verb'
 
     eng_no_labs, brackets_info_html, label_html = format_english_for_card(test_eng_word, test_label)
     print(eng_no_labs)
@@ -114,9 +108,32 @@ def make_anki_cards(vocab):
 
     my_deck.add_note(my_note)
 
+
+
+    test_eng_word = 'to be visible (castle, mountain, etc.)'
+    test_label = 'adjective'
+
+    eng_no_labs, brackets_info_html, label_html = format_english_for_card(test_eng_word, test_label)
+    print(eng_no_labs)
+    print(brackets_info_html)
+    print(label_html)
+
+    fields2 = [
+        "1",
+        eng_no_labs,
+        brackets_info_html,
+        label_html,
+        "Suomen sana",
+        "CHARACTER. FEELINGS. EMOTIONS",
+        "65. Discussion, conversation. Part 1",
+        test_mp3
+    ]
+
+
+
     my_note2 = SuomiNote(
         model=my_model,
-        fields=fields
+        fields=fields2
     )
 
     my_deck.add_note(my_note2)
