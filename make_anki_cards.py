@@ -123,22 +123,29 @@ def make_anki_cards(vocab):
 
     mp3_files = []
     subdecks = []
-    subdeck_id = 1702824815
+    subdeck_id = 1702826815
+    t_idx = 0
+    g_idx = 0
 
     for s_idx, (s_title, section) in enumerate(vocab.items()):
-        for t_idx, (t_title, topic) in enumerate(section.items()):
+        for t_title, topic in section.items():
 
-            print(t_title)
+            t_idx += 1
+            topic_zfill = str(t_idx).zfill(2)
 
-            subdeck_id += 1
-            subdeck_name = f'Suomea::{t_title}'
+            for g_title, group in topic.items():
 
-            topic_subdeck = genanki.Deck(
-                subdeck_id,
-                subdeck_name
-            )
+                g_idx = int(g_title[:g_title.find('.')])
+                group_zfill = str(g_idx).zfill(3)
+                subdeck_name = f'Suomea::T{topic_zfill} - {t_title}::G{group_zfill} - {g_title}'
 
-            for g_idx, (g_title, group) in enumerate(topic.items()):
+                subdeck_id += 1
+
+                group_subdeck = genanki.Deck(
+                    subdeck_id,
+                    subdeck_name
+                )
+
                 for sg_idx, subgroup in enumerate(group):
                     for word in subgroup:
 
@@ -190,9 +197,8 @@ def make_anki_cards(vocab):
                             model=eng_finn_model,
                             fields=eng_finn_fields
                         )
-                        topic_subdeck.add_note(eng_finn_note)
+                        group_subdeck.add_note(eng_finn_note)
 
-            for g_idx, (g_title, group) in enumerate(topic.items()):
                 for sg_idx, subgroup in enumerate(group):
                     for word in subgroup:
 
@@ -246,9 +252,9 @@ def make_anki_cards(vocab):
                             model=finn_eng_model,
                             fields=finn_eng_fields
                         )
-                        topic_subdeck.add_note(finn_eng_note)
+                        group_subdeck.add_note(finn_eng_note)
 
-            subdecks.append(topic_subdeck)
+                subdecks.append(group_subdeck)
 
     package = genanki.Package(subdecks)
     package.media_files = mp3_files
