@@ -17,6 +17,19 @@ def format_english_for_card(eng_no_labs, label):
     return eng_no_labs, brackets_info_html, label_html
 
 
+def make_card_id(s_idx, t_idx, direction, g_idx, sg_idx, w_idx, x_idx):
+    s_str = "S" + str(s_idx).zfill(2) + "0000"
+    t_str = "T" + str(t_idx).zfill(4) + "0000"
+    if direction not in ['eng-finn', 'finn-eng']:
+         raise ValueError("direction arg must be in ['eng-finn', 'finn-eng']")
+    g_str = "G" + str(g_idx).zfill(6) + "0000"
+    sg_str = "SG" + str(sg_idx).zfill(6) + "0000"
+    w_str = "W" + str(w_idx).zfill(4) + "0000"
+    x_str = "X" + str(x_idx).zfill(4) + "0000"
+    card_id = f"0000{s_str}{t_str}{direction}{g_str}{sg_str}{w_str}{x_str}"
+    return card_id, s_str, t_str, direction, g_str, sg_str, w_str, x_str
+
+
 with open("eng_finn_question_format.html", "r") as f:
     eng_finn_question_format = f.read()
 
@@ -33,27 +46,55 @@ with open("style.css", "r") as f:
     style = f.read()
 
 
-my_model = genanki.Model(
-  1832495621,
-  'Simple Model',
-  fields=[
+fields=[
     {'name': 'Card ID'},
-    {'name': 'English word'},
+    {'name': 'Section ID'},
+    {'name': 'Section'},
+    {'name': 'Topic ID'},
+    {'name': 'Topic'},
+    {'name': 'Direction of translation'},
+    {'name': 'Group ID'},
+    {'name': 'Group'},
+    {'name': 'Subgroup ID'},
+    {'name': 'Subgroup'},
+    {'name': 'Word ID'},
+    {'name': 'Word Number'},
+    {'name': 'X ID'},
+    {'name': 'X'},
+    {'name': 'English word, labels'},
+    {'name': 'English word, no labels'},
     {'name': 'English word bracketed info html'},
     {'name': 'English word label html'},
     {'name': 'Finnish'},
-    {'name': 'Topic'},
-    {'name': 'Group'},
-    {'name': 'Finnish MP3'},
-  ],
+    {'name': 'Finnish for filename'},
+    {'name': 'Pronunciation'},
+    {'name': 'Label'},
+    {'name': 'Finnish MP3'}
+]
+
+
+eng_finn_model = genanki.Model(
+  1832495622,
+  'Eng-Finn Model',
+  fields=fields,
   templates=[
     {
-      'name': 'Eng Finn',
+      'name': 'Original Template',
       'qfmt': eng_finn_question_format,
       'afmt': eng_finn_answer_format
     },
+  ],
+  sort_field_index=0,
+  css=style
+)
+
+finn_eng_model = genanki.Model(
+  1832495623,
+  'Eng-Finn Model',
+  fields = fields,
+  templates=[
     {
-      'name': 'Finn Eng',
+      'name': 'Original Template',
       'qfmt': finn_eng_question_format,
       'afmt': finn_eng_answer_format
     },
@@ -74,25 +115,31 @@ class SuomiNote(genanki.Note):
 
 # model ID 1832495620
 # rng 1 1219026387
-# rng 2 1702824815
+# rng 2 
 # rng 3 1542558840
 
 
-test_mp3 = '[sound:aamulla_aikaisin.mp3]'
+def make_anki_cards(vocab):
 
-
-def make_anki_cards(vocab, deck_name):
-
-    my_deck = genanki.Deck(
-        1219026390,
-        deck_name
-    )
     mp3_files = []
+    subdecks = []
+    subdeck_id = 1702824815
 
-    for s_title, section in vocab.items():
-        for t_title, topic in section.items():
-            for g_title, group in topic.items():
-                for subgroup in group:
+    for s_idx, (s_title, section) in enumerate(vocab.items()):
+        for t_idx, (t_title, topic) in enumerate(section.items()):
+
+            print(t_title)
+
+            subdeck_id += 1
+            subdeck_name = f'Suomea::{t_title}'
+
+            topic_subdeck = genanki.Deck(
+                subdeck_id,
+                subdeck_name
+            )
+
+            for g_idx, (g_title, group) in enumerate(topic.items()):
+                for sg_idx, subgroup in enumerate(group):
                     for word in subgroup:
 
                         eng_no_labs = word["English no labels"]
@@ -107,36 +154,114 @@ def make_anki_cards(vocab, deck_name):
                         mp3 = f'[sound:{suo_fname}.mp3]'
                         mp3_files.append(f'../suomea_mp3s/{suo_fname}.mp3')
 
-                        fields = [
-                            "2",
+                        direction = 'eng-finn'
+                        word_number = word["Word Number"]
+
+                        card_id, s_str, t_str, direction, g_str, sg_str, w_str, x_str = \
+                            make_card_id(s_idx, t_idx, direction, g_idx, sg_idx, word_number, 0)
+
+                        eng_finn_fields = [
+                            card_id,
+                            s_str,
+                            s_title,
+                            t_str,
+                            t_title,
+                            direction, 
+                            g_str,
+                            g_title,
+                            sg_str,
+                            str(sg_idx),
+                            w_str,
+                            word_number,
+                            x_str,
+                            "0",
+                            word["English"],
                             eng_no_labs,
                             brackets_info_html,
                             label_html,
                             suo,
-                            t_title,
-                            g_title,
+                            suo_fname,
+                            word["Pronunciation"],
+                            word["Label"],
                             mp3
                         ]
 
-                        my_note = SuomiNote(
-                            model=my_model,
-                            fields=fields
+                        eng_finn_note = SuomiNote(
+                            model=eng_finn_model,
+                            fields=eng_finn_fields
                         )
+                        topic_subdeck.add_note(eng_finn_note)
 
-                        my_deck.add_note(my_note)
+            for g_idx, (g_title, group) in enumerate(topic.items()):
+                for sg_idx, subgroup in enumerate(group):
+                    for word in subgroup:
 
-    my_package = genanki.Package(my_deck)
-    my_package.media_files = mp3_files
-    deck_file = deck_name + '.apkg'
-    my_package.write_to_file(deck_file)
+                        eng_no_labs = word["English no labels"]
+                        label = word["Label"]
+
+                        eng_no_labs, brackets_info_html, label_html = \
+                            format_english_for_card(eng_no_labs, label)
+                        
+                        suo = word["Finnish"]
+                        
+                        suo_fname = word["Finnish for filename"]
+                        mp3 = f'[sound:{suo_fname}.mp3]'
+                        mp3_files.append(f'../suomea_mp3s/{suo_fname}.mp3')
+
+
+                        direction = 'finn-eng'
+                        word_number = word["Word Number"]
+
+
+                        card_id, s_str, t_str, direction, g_str, sg_str, w_str, x_str = \
+                            make_card_id(s_idx, t_idx, direction, g_idx, sg_idx, word_number, 0)
+
+                        finn_eng_fields = [
+                            card_id,
+                            s_str,
+                            s_title,
+                            t_str,
+                            t_title,
+                            direction, 
+                            g_str,
+                            g_title,
+                            sg_str,
+                            str(sg_idx),
+                            w_str,
+                            word_number,
+                            x_str,
+                            "0",
+                            word["English"],
+                            eng_no_labs,
+                            brackets_info_html,
+                            label_html,
+                            suo,
+                            suo_fname,
+                            word["Pronunciation"],
+                            word["Label"],
+                            mp3
+                        ]
+
+                        finn_eng_note = SuomiNote(
+                            model=finn_eng_model,
+                            fields=finn_eng_fields
+                        )
+                        topic_subdeck.add_note(finn_eng_note)
+
+            subdecks.append(topic_subdeck)
+
+    package = genanki.Package(subdecks)
+    package.media_files = mp3_files
+    deck_file = "Suomea.apkg"
+    package.write_to_file(deck_file)
 
     print(f"Deck written to:", deck_file)
 
 
 
-with open('test_vocab.json') as f:
+with open('vocab.json') as f:
     vocab = json.load(f)
 
 #vocab = {"BASIC CONCEPTS": vocab["BASIC CONCEPTS"]}
 
-make_anki_cards(vocab, "Group_1")
+make_anki_cards(vocab)
